@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { MeshStandardNodeMaterial, WebGPURenderer } from "three/webgpu";
 import {
   float,
-  color,
   texture,
   uv,
   time,
@@ -15,6 +14,7 @@ import {
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rendererRef = useRef<WebGPURenderer | null>(null);
 
   useEffect(() => {
     const setup = () => {
@@ -30,7 +30,11 @@ function App() {
       );
 
       const renderer = new WebGPURenderer({ canvas });
-      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      rendererRef.current = renderer;
+
+      if (!rendererRef.current) return;
+
+      rendererRef.current.setSize(canvas.clientWidth, canvas.clientHeight);
 
       // ライト
       const ambient = new THREE.AmbientLight(0xffffff, 0.4);
@@ -72,8 +76,8 @@ function App() {
 
       camera.position.z = 5;
 
-      const frame = () => {
-        renderer.render(scene, camera);
+      const frame = async () => {
+        await rendererRef.current?.renderAsync(scene, camera);
         // cube.rotation.x += 0.01;
         // cube.rotation.y += 0.01;
         requestAnimationFrame(frame);
