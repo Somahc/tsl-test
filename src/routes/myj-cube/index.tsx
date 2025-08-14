@@ -12,7 +12,7 @@ import {
   grayscale,
 } from "three/tsl";
 
-function App() {
+export default function MyjCube() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<WebGPURenderer | null>(null);
 
@@ -95,5 +95,3 @@ function App() {
     </>
   );
 }
-
-export default App;
