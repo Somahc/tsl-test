@@ -13,6 +13,9 @@ export default function Root() {
           <li>
             <Link to="/myj-cube">Myj Cube</Link>
           </li>
+          <li>
+            <Link to="/rasen-sphere">Rasen Sphere</Link>
+          </li>
         </ul>
       </nav>
       <Outlet />

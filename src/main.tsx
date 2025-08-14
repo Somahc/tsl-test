@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./routes/root.tsx";
 import Index from "./routes/index.tsx";
 import MyjCube from "./routes/myj-cube/index.tsx";
+import RasenSphere from "./routes/rasen-sphere/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Index /> },
       { path: "/myj-cube", element: <MyjCube /> },
+      { path: "/rasen-sphere", element: <RasenSphere /> },
     ],
   },
 ]);
