@@ -16,6 +16,9 @@ export default function Root() {
           <li>
             <Link to="/rasen-sphere">Rasen Sphere</Link>
           </li>
+          <li>
+            <Link to="/react-flow">React Flow</Link>
+          </li>
         </ul>
       </nav>
       <Outlet />

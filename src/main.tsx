@@ -5,6 +5,7 @@ import Root from "./routes/root.tsx";
 import Index from "./routes/index.tsx";
 import MyjCube from "./routes/myj-cube/index.tsx";
 import RasenSphere from "./routes/rasen-sphere/index.tsx";
+import ReactFlowPage from "./routes/react-flow/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,7 @@ const router = createBrowserRouter([
       { index: true, element: <Index /> },
       { path: "/myj-cube", element: <MyjCube /> },
       { path: "/rasen-sphere", element: <RasenSphere /> },
+      { path: "/react-flow", element: <ReactFlowPage /> },
     ],
   },
 ]);
