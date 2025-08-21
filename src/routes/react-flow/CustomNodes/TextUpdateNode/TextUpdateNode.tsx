@@ -39,7 +39,7 @@ export default memo(function TextUpdateNode({
           onChange={onChange}
           value={data.text ?? ""}
         />
-        <Handle type="source" position={Position.Bottom} id="text_source" />
+        <Handle type="source" position={Position.Bottom} id="text_out" />
       </div>
     </div>
   );

@@ -4,27 +4,29 @@ import { Handle, Position, useStore } from "@xyflow/react";
 
 export default memo(function TextDisplayNode({ id }: { id: string }) {
   const text = useStore((s) => {
-    const connectedFromTextUpdater = s.edges.some(
-      (e) => e.source === "updater-1" && e.target === id
+    // 自分に入ってくるエッジのうち、ハンドルや type で厳密化
+    console.log("s.edges", s.edges);
+    const inEdge = s.edges.find(
+      (e) => e.target === id && (e.targetHandle ?? "") === "text_in"
     );
 
-    if (!connectedFromTextUpdater) {
-      return null;
-    }
+    if (!inEdge) return null;
 
-    const src = s.nodeLookup.get("updater-1");
-    // console.log("src", src);
-    return (src?.data?.text as string) ?? "";
+    console.log("inEdge", inEdge);
+
+    const src = s.nodeLookup.get(inEdge.source);
+
+    if (!src || src.type !== "textUpdater") return null;
+
+    return (src.data.text as string) ?? "";
   });
-
-  console.log("id", id);
 
   return (
     <div className={style.nodeContainer}>
       <div>テキスト表示ノード</div>
       <br />
       <div>テキスト: {text ?? ""}</div>
-      <Handle type="target" position={Position.Top} id="text_source" />
+      <Handle type="target" position={Position.Top} id="text_in" />
     </div>
   );
 });

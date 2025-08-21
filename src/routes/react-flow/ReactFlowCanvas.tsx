@@ -1,0 +1,102 @@
+import { useCallback, useRef } from "react";
+import {
+  ReactFlow,
+  addEdge,
+  type OnConnect,
+  type Node,
+  type Edge,
+  Background,
+  Controls,
+  useNodesState,
+  useEdgesState,
+  useReactFlow,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+
+import style from "./index.module.scss";
+import nodeTypes from "./CustomNodes/NodeTypes";
+
+type TextUpdaterData = {
+  value: string;
+};
+
+type TextDisplayData = {
+  text: string;
+};
+
+type AppNode = Node<TextUpdaterData | TextDisplayData>;
+type AppEdge = Edge;
+
+export default function ReactFlowCanvas() {
+  const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>([
+    // {
+    //   id: "updater-1",
+    //   type: "textUpdater",
+    //   position: { x: 0, y: 0 },
+    //   data: { text: "" },
+    // },
+    // {
+    //   id: "updater-2",
+    //   type: "textUpdater",
+    //   position: { x: 120, y: 0 },
+    //   data: { text: "" },
+    // },
+    // {
+    //   id: "displayer-1",
+    //   type: "textDisplay",
+    //   position: { x: 0, y: 120 },
+    //   data: { text: "" },
+    // },
+  ]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<AppEdge>([]);
+
+  const rf = useReactFlow();
+  const idSeq = useRef(0);
+  const nextId = () => `node-${idSeq.current++}`;
+
+  const addUpdaterNode = () => {
+    rf.addNodes({
+      id: nextId(),
+      type: "textUpdater",
+      position: { x: 0, y: 0 },
+      data: { text: "" },
+    });
+  };
+
+  const addDisplayNode = () => {
+    rf.addNodes({
+      id: nextId(),
+      type: "textDisplay",
+      position: { x: 0, y: 0 },
+      data: { text: "" },
+    });
+  };
+
+  const onConnect: OnConnect = useCallback(
+    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    [setEdges]
+  );
+
+  console.log("nodes", nodes);
+  console.log("edges", edges);
+  return (
+    <>
+      <div className={style.editorContainer}>
+        <button onClick={addUpdaterNode}>テキスト更新ノード追加</button>
+        <button onClick={addDisplayNode}>テキスト表示ノード追加</button>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </div>
+    </>
+  );
+}
