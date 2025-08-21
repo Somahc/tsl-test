@@ -81,9 +81,9 @@ export default function ReactFlowCanvas() {
   console.log("edges", edges);
   return (
     <>
+      <button onClick={addUpdaterNode}>テキスト更新ノード追加</button>
+      <button onClick={addDisplayNode}>テキスト表示ノード追加</button>
       <div className={style.editorContainer}>
-        <button onClick={addUpdaterNode}>テキスト更新ノード追加</button>
-        <button onClick={addDisplayNode}>テキスト表示ノード追加</button>
         <ReactFlow
           nodes={nodes}
           edges={edges}
