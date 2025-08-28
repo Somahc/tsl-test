@@ -24,7 +24,17 @@ type TextDisplayData = {
   text: string;
 };
 
-type AppNode = Node<TextUpdaterData | TextDisplayData>;
+type ColorPickerData = {
+  color: string;
+};
+
+type OutputData = {
+  color: string;
+};
+
+type AppNode = Node<
+  TextUpdaterData | TextDisplayData | ColorPickerData | OutputData
+>;
 type AppEdge = Edge;
 
 export default function ReactFlowCanvas() {
@@ -72,9 +82,50 @@ export default function ReactFlowCanvas() {
     });
   };
 
+  const addColorPickerNode = () => {
+    rf.addNodes({
+      id: nextId(),
+      type: "colorPicker",
+      position: { x: 0, y: 0 },
+      data: { color: "" },
+    });
+  };
+
+  const addOutputNode = () => {
+    rf.addNodes({
+      id: nextId(),
+      type: "output",
+      position: { x: 0, y: 0 },
+      data: { color: "" },
+    });
+  };
+
   const onConnect: OnConnect = useCallback(
-    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [setEdges]
+    (params) => {
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot));
+
+      const sourceNode = rf.getNode(params.source ?? "");
+      const targetNode = rf.getNode(params.target ?? "");
+
+      const isColorConnection =
+        sourceNode?.type === "colorPicker" &&
+        targetNode?.type === "output" &&
+        (params.sourceHandle ?? "") === "color_out" &&
+        (params.targetHandle ?? "") === "color_in";
+
+      if (isColorConnection) {
+        const sourceColor =
+          (sourceNode?.data as { color?: string })?.color ?? "";
+        setNodes((nodesSnapshot) =>
+          nodesSnapshot.map((n) =>
+            n.id === targetNode!.id
+              ? { ...n, data: { ...n.data, color: sourceColor } }
+              : n
+          )
+        );
+      }
+    },
+    [rf, setEdges, setNodes]
   );
 
   console.log("nodes", nodes);
@@ -83,6 +134,8 @@ export default function ReactFlowCanvas() {
     <>
       <button onClick={addUpdaterNode}>テキスト更新ノード追加</button>
       <button onClick={addDisplayNode}>テキスト表示ノード追加</button>
+      <button onClick={addColorPickerNode}>カラーピッカーノード追加</button>
+      <button onClick={addOutputNode}>出力ノード追加</button>
       <div className={style.editorContainer}>
         <ReactFlow
           nodes={nodes}
