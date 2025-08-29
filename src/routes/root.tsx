@@ -19,6 +19,9 @@ export default function Root() {
           <li>
             <Link to="/react-flow">React Flow</Link>
           </li>
+          <li>
+            <Link to="/flow-tutorial">Flow Tutorial</Link>
+          </li>
         </ul>
       </nav>
       <Outlet />
