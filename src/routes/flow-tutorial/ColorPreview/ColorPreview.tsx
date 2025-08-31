@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 
 type Props = {
-  id: string;
+  id: "red" | "green" | "blue";
   label: string;
   setColor: (value: (c: RGB) => RGB) => void;
 };
@@ -23,13 +23,9 @@ function CustomHandle({ id, label, setColor }: Props) {
   const nodeData = useNodesData(connections?.[0].source);
 
   useEffect(() => {
-    const channel = id.charAt(0).toLowerCase();
+    const channel = id.charAt(0).toLowerCase() as keyof RGB;
     const next = nodeData?.data ? (nodeData.data.value as number) : 0;
-    setColor((c: RGB) =>
-      c[channel as keyof RGB] === next
-        ? c
-        : { ...c, [channel as keyof RGB]: next }
-    );
+    setColor((c: RGB) => (c[channel] === next ? c : { ...c, [channel]: next }));
   }, [nodeData, setColor, id]);
 
   return (
