@@ -11,10 +11,10 @@ import { useEffect, useState } from "react";
 type Props = {
   id: string;
   label: string;
-  onChange: (value: number) => void;
+  setColor: (value: (c: RGB) => RGB) => void;
 };
 
-function CustomHandle({ id, label, onChange }: Props) {
+function CustomHandle({ id, label, setColor }: Props) {
   const connections = useNodeConnections({
     handleType: "target",
     handleId: id,
@@ -23,8 +23,14 @@ function CustomHandle({ id, label, onChange }: Props) {
   const nodeData = useNodesData(connections?.[0].source);
 
   useEffect(() => {
-    onChange(nodeData?.data ? (nodeData.data.value as number) : 0);
-  }, [nodeData, onChange]);
+    const channel = id.charAt(0).toLowerCase();
+    const next = nodeData?.data ? (nodeData.data.value as number) : 0;
+    setColor((c: RGB) =>
+      c[channel as keyof RGB] === next
+        ? c
+        : { ...c, [channel as keyof RGB]: next }
+    );
+  }, [nodeData, setColor, id]);
 
   return (
     <div>
@@ -34,7 +40,7 @@ function CustomHandle({ id, label, onChange }: Props) {
   );
 }
 
-type RGB = { r: number; g: number; b: number };
+export type RGB = { r: number; g: number; b: number };
 export type ColorPreviewNode = Node<{ value?: RGB }, "ColorPreview">;
 
 export default function ColorPreview({
@@ -50,22 +56,11 @@ export default function ColorPreview({
           background: `rgb(${color.r}, ${color.g}, ${color.b})`,
         }}
       >
-        <CustomHandle
-          id="red"
-          label="R"
-          onChange={(value) => setColor((c) => ({ ...c, r: value }))}
-        />
-        <CustomHandle
-          id="green"
-          label="G"
-          onChange={(value) => setColor((c) => ({ ...c, g: value }))}
-        />
-        <CustomHandle
-          id="blue"
-          label="B"
-          onChange={(value) => setColor((c) => ({ ...c, b: value }))}
-        />
+        <CustomHandle id="red" label="R" setColor={setColor} />
+        <CustomHandle id="green" label="G" setColor={setColor} />
+        <CustomHandle id="blue" label="B" setColor={setColor} />
       </div>
+      <Handle type="source" position={Position.Right} id="output" />
     </>
   );
 }
