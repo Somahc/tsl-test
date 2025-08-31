@@ -3,15 +3,15 @@ import {
   Position,
   useNodeConnections,
   useNodesData,
-  useReactFlow,
   type Node,
   type NodeProps,
 } from "@xyflow/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   id: string;
   label: string;
+  onChange: (value: number) => void;
 };
 
 function CustomHandle({ id, label, onChange }: Props) {
@@ -20,18 +20,11 @@ function CustomHandle({ id, label, onChange }: Props) {
     handleId: id,
   });
 
-  const nodeData = useNodesData<Node<{ value: number }>>(
-    connections?.[0]?.source
-  );
+  const nodeData = useNodesData(connections?.[0].source);
 
   useEffect(() => {
-    onChange(nodeData?.data ? nodeData.data.value : 0);
-  }, [nodeData]);
-
-  // useEffect(() => {
-  //   const incomingValue = nodeData?.data?.value;
-  //   onChange(typeof incomingValue === "number" ? incomingValue : 0);
-  // }, [nodeData, onChange]);
+    onChange(nodeData?.data ? (nodeData.data.value as number) : 0);
+  }, [nodeData, onChange]);
 
   return (
     <div>
@@ -48,29 +41,7 @@ export default function ColorPreview({
   id,
   data,
 }: NodeProps<ColorPreviewNode>) {
-  const redConnections = useNodeConnections({
-    handleType: "target",
-    handleId: "red",
-  });
-  const redNodeData = useNodesData(redConnections?.[0].source);
-
-  const greenConnections = useNodeConnections({
-    handleType: "target",
-    handleId: "green",
-  });
-  const greenNodeData = useNodesData(greenConnections?.[0].source);
-
-  const blueConnections = useNodeConnections({
-    handleType: "target",
-    handleId: "blue",
-  });
-  const blueNodeData = useNodesData(blueConnections?.[0].source);
-
-  const color = {
-    r: redNodeData?.data ? redNodeData.data.value : 0,
-    g: greenNodeData?.data ? greenNodeData.data.value : 0,
-    b: blueNodeData?.data ? blueNodeData.data.value : 0,
-  };
+  const [color, setColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
 
   return (
     <>
@@ -79,18 +50,21 @@ export default function ColorPreview({
           background: `rgb(${color.r}, ${color.g}, ${color.b})`,
         }}
       >
-        <div>
-          <Handle type="target" position={Position.Left} id="red" />
-          <label>R</label>
-        </div>
-        <div>
-          <Handle type="target" position={Position.Left} id="green" />
-          <label>G</label>
-        </div>
-        <div>
-          <Handle type="target" position={Position.Left} id="blue" />
-          <label>B</label>
-        </div>
+        <CustomHandle
+          id="red"
+          label="R"
+          onChange={(value) => setColor((c) => ({ ...c, r: value }))}
+        />
+        <CustomHandle
+          id="green"
+          label="G"
+          onChange={(value) => setColor((c) => ({ ...c, g: value }))}
+        />
+        <CustomHandle
+          id="blue"
+          label="B"
+          onChange={(value) => setColor((c) => ({ ...c, b: value }))}
+        />
       </div>
     </>
   );
