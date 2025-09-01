@@ -13,13 +13,15 @@ import ColorPreview, {
   type ColorPreviewNode,
 } from "./ColorPreview/ColorPreview";
 import { type Node } from "@xyflow/react";
+import Lightness, { type LightnessNode } from "./Lightness/Lightness";
 
 const nodeTypes = {
   NumberInput,
   ColorPreview,
+  Lightness,
 };
 
-const initialNodes: AppNode[] = [
+const initialNodes: Node[] = [
   {
     type: "NumberInput",
     id: "1",
@@ -42,7 +44,13 @@ const initialNodes: AppNode[] = [
     type: "ColorPreview",
     id: "color",
     position: { x: 150, y: 50 },
-    data: { label: "Color" },
+    data: { label: "Color", value: { r: 0, g: 0, b: 0 } },
+  },
+  {
+    type: "Lightness",
+    id: "lightness",
+    position: { x: 350, y: 75 },
+    data: { value: { r: 0, g: 0, b: 0 } },
   },
 ];
 
@@ -65,15 +73,17 @@ const initialEdges = [
     target: "color",
     targetHandle: "blue",
   },
+  {
+    id: "color-lightness",
+    source: "color",
+    target: "lightness",
+  },
 ];
 
-type AppNode = Node<
-  NumberInputNode["data"] | ColorPreviewNode["data"],
-  NumberInputNode["type"] | ColorPreviewNode["type"]
->;
+// type AppNode = Node<NumberInputNode | ColorPreviewNode | LightnessNode>;
 
 export default function FlowTutorial() {
-  const [nodes, setNodes, onNodesChange] = useNodesState<AppNode>(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
