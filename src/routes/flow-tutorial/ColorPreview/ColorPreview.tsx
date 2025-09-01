@@ -7,36 +7,33 @@ import {
   type NodeProps,
   useReactFlow,
 } from "@xyflow/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 type Props = {
   id: "red" | "green" | "blue";
   label: string;
-  setColor: (value: (c: RGB) => RGB) => void;
   onChange: (value: number) => void;
-  color: RGB;
+  current: number;
 };
 
-function CustomHandle({ id, label, setColor, onChange, color }: Props) {
+function CustomHandle({ id, label, onChange, current }: Props) {
   const connections = useNodeConnections({
     handleType: "target",
     handleId: id,
   });
 
   const nodeData = useNodesData(connections?.[0].source);
-  const channel = id.charAt(0).toLowerCase() as keyof RGB;
-  const next = nodeData?.data ? (nodeData.data.value as number) : 0;
+  const next = nodeData?.data ? nodeData.data.value : 0;
 
   useEffect(() => {
-    setColor((c: RGB) => (c[channel] === next ? c : { ...c, [channel]: next }));
-  }, [nodeData, setColor, id, channel, next]);
-
-  useEffect(() => {
-    if (color[channel] === next) {
+    if (typeof next !== "number") {
+      return;
+    }
+    if (current === next || Number.isNaN(next)) {
       return;
     }
     onChange(next);
-  }, [nodeData, id, color, onChange, channel, next]);
+  }, [onChange, next, current]);
 
   return (
     <div>
@@ -53,48 +50,47 @@ export default function ColorPreview({
   id,
   data,
 }: NodeProps<ColorPreviewNode>) {
-  const [color, setColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
+  // このノードの現在の data（なければデフォルト）
+  const self = data?.value ?? { r: 0, g: 0, b: 0 };
+
   const { updateNodeData } = useReactFlow();
 
   return (
     <>
       <div
         style={{
-          background: `rgb(${color.r}, ${color.g}, ${color.b})`,
+          background: `rgb(${self.r}, ${self.g}, ${self.b})`,
         }}
       >
         <CustomHandle
           id="red"
           label="R"
-          setColor={setColor}
           onChange={(value) => {
             updateNodeData(id, (node) => {
               return { value: { ...node.data.value!, r: value } };
             });
           }}
-          color={color}
+          current={self.r}
         />
         <CustomHandle
           id="green"
           label="G"
-          setColor={setColor}
           onChange={(value) => {
             updateNodeData(id, (node) => {
               return { value: { ...node.data.value!, g: value } };
             });
           }}
-          color={color}
+          current={self.g}
         />
         <CustomHandle
           id="blue"
           label="B"
-          setColor={setColor}
           onChange={(value) => {
             updateNodeData(id, (node) => {
               return { value: { ...node.data.value!, b: value } };
             });
           }}
-          color={color}
+          current={self.b}
         />
       </div>
       <Handle type="source" position={Position.Right} id="output" />
