@@ -18,7 +18,6 @@ export type LightnessNode = Node<
 export default function Lightness() {
   const connections = useNodeConnections({ handleType: "target" });
   const nodesData = useNodesData(connections?.[0].source);
-  console.log("nodesData", nodesData);
   const [lightness, setLightness] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
